@@ -10,9 +10,10 @@
 #define LOG_CAMERA(camera)                                                                                             \
     TraceLog(LOG_INFO, "Camera: [%f, %f, %f]", camera->position.x, camera->position.y, camera->position.z)
 
+static int g_disable_mouse_cursor = false;
+
 static inline Camera3D
-init_camera() {
-    DisableCursor();
+camera_init() {
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 0.f, 10.f, 10.f };
     camera.target = (Vector3){ 0.f, 0.f, 0.f };
@@ -23,7 +24,29 @@ init_camera() {
 }
 
 static inline void
-rotate_camera(Camera3D* camera, float delta) {
+camera_set_cursor_state() {
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        g_disable_mouse_cursor = true;
+        DisableCursor();
+    }
+    if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
+        g_disable_mouse_cursor = false;
+        EnableCursor();
+    }
+}
+
+static inline bool
+camera_can_rotate() {
+    if (g_disable_mouse_cursor) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+static inline void
+camera_rotate(Camera3D* camera, float delta) {
     const float springarm_length = Vector3Length(camera->position); // Assume we always look at Vector.ZERO
     LOG_CAMERA(camera);
 

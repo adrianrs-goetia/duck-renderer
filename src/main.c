@@ -20,10 +20,12 @@ main(int argc, char** argv) {
     // Model duck_model = LoadModel("../assets/YellowDuck1glb.glb");
     Model duck_model = LoadModel("../assets/duck-photographer.glb");
 
-    Camera3D camera = init_camera();
+    Camera3D camera = camera_init();
 
     while (!WindowShouldClose()) {
         BeginDrawing();
+        // Input
+        camera_set_cursor_state();
 
         // Background
         float stime = (sin(GetTime()) + 1.f) / 2.f;
@@ -34,7 +36,9 @@ main(int argc, char** argv) {
 
         // 3D World
         BeginMode3D(camera);
-        rotate_camera(&camera, GetFrameTime());
+        if (camera_can_rotate()) {
+            camera_rotate(&camera, GetFrameTime());
+        }
 
         Matrix transform = duck_model.transform;
         transform = MatrixRotateY(stime);
